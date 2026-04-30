@@ -16,4 +16,4 @@ def create_presentation(title: str, slides: str, filename: str) -> str:
 
     output = f"{filename}.pptx"
     prs.save(output)
-    return f"✅ Presentación '{output}' creada."
+    return f"Presentación '{output}' creada."
