@@ -1,8 +1,10 @@
 from mcp.server.fastmcp import FastMCP
+import os
 
 from app.tools.email import send_email as _send_email
 from app.tools.report.word_tool import create_report as _create_report
 from app.tools.presentation.slides_tool import create_presentation as _create_presentation
+from app.tools.task.task_tool import create_task, list_task, delete_task
 
 mcp = FastMCP("lexi")
 
@@ -52,3 +54,23 @@ def create_presentation(title: str, slides: str, filename: str) -> str:
     Returns the file name of the created presentation.
     """
     return _create_presentation(title, slides, filename)
+
+@mcp.tool()
+def manage_task(action: str, task_name: str, script_path: str = "", trigger_time: str = "08:00") -> str:
+    """
+    Manage Windows Task Scheduler tasks.
+    - action: "create" | "list" | "delete"
+    - task_name: unique task name
+    - script_path: path to .py script (required for create)
+    - trigger_time: "HH:MM" daily trigger (required for create)
+    """
+    config = {"task_manager": {"python_path": os.getenv("PYTHON_PATH", "python")}}
+    params = {"action": action, "task_name": task_name, "script_path": script_path, "trigger_time": trigger_time}
+
+    if action == "create":
+        return str(create_task(params, config))
+    elif action == "list":
+        return str(list_task())
+    elif action == "delete":
+        return str(delete_task(params))
+    raise ValueError(f"Acción no válida: {action}")
