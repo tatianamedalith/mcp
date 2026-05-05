@@ -5,5 +5,7 @@ def create_report(title: str, content: str, filename: str, output_path: str | No
     doc = Document()
     doc.add_heading(title, level=1)
     doc.add_paragraph(content)
-    doc.save(filename)
-    return f"Word document '{filename}' created successfully."
+    output = f"{filename}.docx"
+    doc.save(output)
+    return f"Word document '{output}' created successfully."
+    
