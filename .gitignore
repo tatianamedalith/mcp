@@ -12,3 +12,10 @@ wheels/
 
 # Generated output
 output/
+
+# Logs y auditoría
+*.log
+audit/
+audit.*
+*.audit
+logs/
