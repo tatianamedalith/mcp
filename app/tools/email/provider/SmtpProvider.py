@@ -5,15 +5,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import make_msgid
 import smtplib
+from pathlib import Path
+
 from app.tools.email.provider.EmailProvider import EmailProvider
 from app.config import Config
-import os
 
 class SmtpProvider(EmailProvider):
     def send(self, to, subject, html, cc, bcc, attachments) -> str:
         user = Config.SMTP_USER
         password = Config.SMTP_PASSWORD
-        from_addr = user
+        from_addr = Config.SMTP_FROM
         host = Config.SMTP_HOST
         port = Config.SMTP_PORT
 
@@ -48,11 +49,11 @@ class SmtpProvider(EmailProvider):
         return outer
 
     def _encode_file(self, path: str) -> MIMEBase:
-        if not os.path.exists(path):
+        p = Path(path)
+        if not p.exists():
             raise FileNotFoundError(f"Attachment not found: {path}")
         part = MIMEBase("application", "octet-stream")
-        with open(path, "rb") as f:
-            part.set_payload(f.read())
+        part.set_payload(p.read_bytes())
         encoders.encode_base64(part)
-        part.add_header("Content-Disposition", f'attachment; filename="{os.path.basename(path)}"')
+        part.add_header("Content-Disposition", f'attachment; filename="{p.name}"')
         return part

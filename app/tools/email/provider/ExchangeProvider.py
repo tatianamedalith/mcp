@@ -1,8 +1,9 @@
 
 from exchangelib import DELEGATE, Account, Credentials, FileAttachment, HTMLBody, Mailbox, Message
+from pathlib import Path
+
 from app.tools.email.provider.EmailProvider import EmailProvider
 from app.config import Config
-import os
 
 
 class ExchangeProvider(EmailProvider):
@@ -29,10 +30,10 @@ class ExchangeProvider(EmailProvider):
         )
 
         for path in attachments:
-            if not os.path.exists(path):
+            p = Path(path)
+            if not p.exists():
                 raise FileNotFoundError(f"Attachment not found: {path}")
-            with open(path, "rb") as f:
-                msg.attach(FileAttachment(name=os.path.basename(path), content=f.read()))
+            msg.attach(FileAttachment(name=p.name, content=p.read_bytes()))
 
         msg.send()
         return f"Email sent to {to} via Exchange"

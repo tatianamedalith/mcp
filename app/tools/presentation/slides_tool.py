@@ -1,7 +1,14 @@
+from pathlib import Path
+
 from pptx import Presentation
 
 
 def create_presentation(title: str, slides: str, filename: str, output_path: str | None = None) -> str:
+    
+    base = Path(output_path) if output_path else Path("output")
+    base.mkdir(parents=True, exist_ok=True)
+    output = base / f"{filename}.pptx"
+    
     prs = Presentation()
     slide = prs.slides.add_slide(prs.slide_layouts[0])
     slide.shapes.title.text = title
@@ -12,6 +19,5 @@ def create_presentation(title: str, slides: str, filename: str, output_path: str
         slide.shapes.title.text = partes[0].strip()
         if len(partes) > 1:
             slide.placeholders[1].text = partes[1].strip()
-    output = f"{filename}.pptx"
     prs.save(output)
-    return f"Presentación '{output}' creada."
+    return str(output.resolve()) 
