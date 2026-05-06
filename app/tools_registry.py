@@ -34,29 +34,59 @@ def send_email(
 
 
 @mcp.tool(auth=require_scopes("reports"))
-def create_report(title: str, content: str, filename: str,  output_path: str | None = None) -> str:
+def create_report(
+    title: str,
+    content: str,
+    filename: str,
+    sections: str | None = None,
+    output_path: str | None = None,
+) -> str:
     """
-    Create a Word document (.docx).
-    - title: document title
-    - content: body text
-    - filename: output file name (without .docx)
-    - output_path: absolute folder path where the file will be saved (optional, defaults to ./output/)
-    Returns the absolute path of the created document.
+    Create a Word document (.docx) with optional sections.
+    
+    Args:
+        title: Main title of the document.
+        content: Introductory body text (plain text).
+        filename: Desired output filename (without .docx extension).
+        sections: Optional pipe-separated section blocks in the format "SectionTitle:SectionContent".
+                  Example: "Summary:Key findings|Details:Full analysis"
+        output_path: Optional absolute folder path where the file will be saved.
+                     Defaults to Config.REPORTS_DIR.
+    
+    Returns:
+        Absolute path of the created .docx file.
     """
-    return _create_report(title, content, filename, output_path=output_path or str(Config.REPORTS_DIR))
+    return _create_report(
+        title, content, filename,
+        sections=sections,
+        output_path=output_path or str(Config.REPORTS_DIR),
+    )
 
 
 @mcp.tool(auth=require_scopes("presentations"))
-def create_presentation(title: str, slides: str, filename: str,  output_path: str | None = None) -> str:
+def create_presentation(title: str, slides: str, filename: str, output_path: str | None = None) -> str:
     """
-    Create a PowerPoint presentation (.pptx).
-    - title: presentation title
-    - slides: pipe-separated slides as 'Title:Content'
-      Example: "Intro:Welcome|Overview:Key points"
-    - filename: output file name (without .pptx)
-    - output_path: absolute folder path where the file will be saved (optional, defaults to ./output/)
-    Returns the absolute path of the created presentation.
+    Create a PowerPoint presentation (.pptx) from a template.
+    
+    The template has two slides: a title slide and a content slide.
+    The title slide is updated with the given title.
+    The content slide is multiplied (one per slide entry) and each copy is filled with the provided data.
+    
+    Args:
+        title: Presentation title (used on the first/title slide).
+        slides: Pipe-separated slide definitions in the format "Title:Content" or "Title:Content:image_path".
+                Example: "Intro:Welcome|Chart:Q1 results:/reports/chart.png"
+                - Title: section title (appears as slide heading)
+                - Content: body text (plain)
+                - image_path: optional absolute path to an image (jpg, png, etc.)
+        filename: Desired output filename (without .pptx extension).
+        output_path: Optional absolute folder path where the file will be saved.
+                     Defaults to Config.PRESENTATIONS_DIR.
+    
+    Returns:
+        Absolute path of the created .pptx file.
     """
+    
     return _create_presentation(title, slides, filename, output_path=output_path or str(Config.PRESENTATIONS_DIR))
 
 @mcp.tool(auth=require_scopes("tasks"))
