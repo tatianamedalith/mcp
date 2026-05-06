@@ -6,10 +6,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import mcp.types as mt
+
 from fastmcp.server.middleware import CallNext, Middleware, MiddlewareContext
 from fastmcp.server.middleware.middleware import ToolResult
 
-DB_PATH = Path("audit.db")
+from app.config import Config
+
+DB_PATH = Config.AUDIT_DB_PATH
 
 
 def _init_db() -> None:

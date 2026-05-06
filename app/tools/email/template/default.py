@@ -1,7 +1,8 @@
-NAME = "Tatiana Paucar"
-ROLE = "AI Engineer Intern"
-LOGO = "https://res.cloudinary.com/dqgpis4fg/image/upload/v1777557074/skptrceca3cyqlv5xspo.png"
+from app.config import Config
 
+NAME = Config.SIGNATURE_NAME
+ROLE = Config.SIGNATURE_ROLE
+LOGO = Config.SIGNATURE_LOGO
 
 def build_html(body: str) -> str:
     return f"""

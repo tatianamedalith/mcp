@@ -1,13 +1,9 @@
-from dotenv import load_dotenv
-
 from .template.default import build_html
 from .provider.SmtpProvider import SmtpProvider
 from .provider.ExchangeProvider import ExchangeProvider
+from app.config import Config
 
-load_dotenv()
-
-_provider = SmtpProvider()  # swap to ExchangeProvider() for Outlook
-
+_provider = ExchangeProvider() if Config.EMAIL_PROVIDER.lower() == "exchange" else SmtpProvider()
 
 def send_email(
     to: list[str],

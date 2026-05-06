@@ -36,4 +36,4 @@ class ExchangeProvider(EmailProvider):
             msg.attach(FileAttachment(name=p.name, content=p.read_bytes()))
 
         msg.send()
-        return f"Email sent to {to} via Exchange"
+        return f"Email sent to {to} via Exchange, message_id: {msg.message_id}"

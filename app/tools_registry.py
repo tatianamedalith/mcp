@@ -43,7 +43,7 @@ def create_report(title: str, content: str, filename: str,  output_path: str | N
     - output_path: absolute folder path where the file will be saved (optional, defaults to ./output/)
     Returns the absolute path of the created document.
     """
-    return _create_report(title, content, filename, output_path=output_path)
+    return _create_report(title, content, filename, output_path=output_path or str(Config.REPORTS_DIR))
 
 
 @mcp.tool(auth=require_scopes("presentations"))
@@ -57,7 +57,7 @@ def create_presentation(title: str, slides: str, filename: str,  output_path: st
     - output_path: absolute folder path where the file will be saved (optional, defaults to ./output/)
     Returns the absolute path of the created presentation.
     """
-    return _create_presentation(title, slides, filename)
+    return _create_presentation(title, slides, filename, output_path=output_path or str(Config.PRESENTATIONS_DIR))
 
 @mcp.tool(auth=require_scopes("tasks"))
 def manage_task(action: str, task_name: str, script_path: str = "", trigger_time: str = "08:00") -> str:
