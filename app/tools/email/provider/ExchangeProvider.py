@@ -1,19 +1,19 @@
 
-
-import os
 from exchangelib import DELEGATE, Account, Credentials, FileAttachment, HTMLBody, Mailbox, Message
 from app.tools.email.provider.EmailProvider import EmailProvider
+from app.config import Config
+import os
 
 
 class ExchangeProvider(EmailProvider):
     def send(self, to, subject, html, cc, bcc, attachments) -> str:
 
         credentials = Credentials(
-            username=os.getenv("EXCHANGE_USER", ""),
-            password=os.getenv("EXCHANGE_PASSWORD", ""),
+            username=Config.EXCHANGE_EMAIL,
+            password=Config.EXCHANGE_PASSWORD,
         )
         account = Account(
-            primary_smtp_address=os.getenv("EXCHANGE_EMAIL", ""),
+            primary_smtp_address=Config.EXCHANGE_EMAIL,
             credentials=credentials,
             autodiscover=True,
             access_type=DELEGATE,
