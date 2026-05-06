@@ -1,4 +1,5 @@
 from fastmcp import FastMCP
+from fastmcp.server.auth import require_scopes
 
 from app.auth import token_verifier
 from app.config import Config
@@ -10,7 +11,7 @@ from app.tools.task.task_tool import create_task, list_task, delete_task
 mcp = FastMCP("lexi", auth=token_verifier)
 
 
-@mcp.tool()
+@mcp.tool(auth=require_scopes("email"))
 def send_email(
     to: list[str],
     subject: str,
@@ -32,31 +33,33 @@ def send_email(
     return _send_email(to, subject, body, cc=cc, bcc=bcc, attachments=attachments)
 
 
-@mcp.tool()
-def create_report(title: str, content: str, filename: str) -> str:
+@mcp.tool(auth=require_scopes("reports"))
+def create_report(title: str, content: str, filename: str,  output_path: str | None = None) -> str:
     """
     Create a Word document (.docx).
     - title: document title
     - content: body text
     - filename: output file name (without .docx)
-    Returns the file name of the created document.
+    - output_path: absolute folder path where the file will be saved (optional, defaults to ./output/)
+    Returns the absolute path of the created document.
     """
-    return _create_report(title, content, filename)
+    return _create_report(title, content, filename, output_path=output_path)
 
 
-@mcp.tool()
-def create_presentation(title: str, slides: str, filename: str) -> str:
+@mcp.tool(auth=require_scopes("presentations"))
+def create_presentation(title: str, slides: str, filename: str,  output_path: str | None = None) -> str:
     """
     Create a PowerPoint presentation (.pptx).
     - title: presentation title
     - slides: pipe-separated slides as 'Title:Content'
       Example: "Intro:Welcome|Overview:Key points"
     - filename: output file name (without .pptx)
-    Returns the file name of the created presentation.
+    - output_path: absolute folder path where the file will be saved (optional, defaults to ./output/)
+    Returns the absolute path of the created presentation.
     """
     return _create_presentation(title, slides, filename)
 
-@mcp.tool()
+@mcp.tool(auth=require_scopes("tasks"))
 def manage_task(action: str, task_name: str, script_path: str = "", trigger_time: str = "08:00") -> str:
     """
     Manage Windows Task Scheduler tasks.
