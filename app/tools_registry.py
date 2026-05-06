@@ -1,12 +1,13 @@
-from mcp.server.fastmcp import FastMCP
-import os
+from fastmcp import FastMCP
 
+from app.auth import token_verifier
+from app.config import Config
 from app.tools.email import send_email as _send_email
 from app.tools.report.word_tool import create_report as _create_report
 from app.tools.presentation.slides_tool import create_presentation as _create_presentation
 from app.tools.task.task_tool import create_task, list_task, delete_task
 
-mcp = FastMCP("lexi")
+mcp = FastMCP("lexi", auth=token_verifier)
 
 
 @mcp.tool()
@@ -64,7 +65,7 @@ def manage_task(action: str, task_name: str, script_path: str = "", trigger_time
     - script_path: path to .py script (required for create)
     - trigger_time: "HH:MM" daily trigger (required for create)
     """
-    config = {"task_manager": {"python_path": os.getenv("PYTHON_PATH", "python")}}
+    config = {"task_manager": {"python_path": Config.PYTHON_PATH}}
     params = {"action": action, "task_name": task_name, "script_path": script_path, "trigger_time": trigger_time}
 
     if action == "create":

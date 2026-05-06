@@ -1,13 +1,13 @@
 
-from fastapi import FastAPI
 from app.tools_registry import mcp
+from app.config import Config
+from app.rate_limiter import rate_limit_middleware
 
-app = FastAPI(title="MCP Server", version="1.0.0")
-app.mount("/mcp", mcp.streamable_http_app())
-
-@app.get("/health")
-async def health():
-    return {"status": "ok"}
+mcp.add_middleware(rate_limit_middleware)
 
 if __name__ == "__main__":
-    mcp.run(transport="streamable-http")
+    mcp.run(
+        transport="streamable-http",
+        host=Config.HOST,
+        port=Config.PORT,
+    )
