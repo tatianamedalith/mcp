@@ -16,8 +16,6 @@ class Config:
     JWT_AUDIENCE = os.getenv("JWT_AUDIENCE", "lexi-mcp")
 
     # Server
-    HOST = os.getenv("HOST", "127.0.0.1")
-    PORT = int(os.getenv("PORT", "8000"))
     RATE_LIMIT_RPS = float(os.getenv("RATE_LIMIT_RPS", "1.67"))
     RATE_LIMIT_BURST = int(os.getenv("RATE_LIMIT_BURST", "20"))
 

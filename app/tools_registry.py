@@ -1,17 +1,15 @@
 from fastmcp import FastMCP
-from fastmcp.server.auth import require_scopes
 
-from app.auth import token_verifier
 from app.config import Config
 from app.tools.email import send_email as _send_email
 from app.tools.report.word_tool import create_report as _create_report
 from app.tools.presentation.slides_tool import create_presentation as _create_presentation
 from app.tools.task.task_tool import create_task, list_task, delete_task
 
-mcp = FastMCP("lexi", auth=token_verifier)
+mcp = FastMCP("lexi")
 
 
-@mcp.tool(auth=require_scopes("email"))
+@mcp.tool()
 def send_email(
     to: list[str],
     subject: str,
@@ -33,7 +31,7 @@ def send_email(
     return _send_email(to, subject, body, cc=cc, bcc=bcc, attachments=attachments)
 
 
-@mcp.tool(auth=require_scopes("reports"))
+@mcp.tool()
 def create_report(
     title: str,
     content: str,
@@ -63,7 +61,7 @@ def create_report(
     )
 
 
-@mcp.tool(auth=require_scopes("presentations"))
+@mcp.tool()
 def create_presentation(title: str, slides: str, filename: str, output_path: str | None = None) -> str:
     """
     Create a PowerPoint presentation (.pptx) from a template.
@@ -89,7 +87,7 @@ def create_presentation(title: str, slides: str, filename: str, output_path: str
     
     return _create_presentation(title, slides, filename, output_path=output_path or str(Config.PRESENTATIONS_DIR))
 
-@mcp.tool(auth=require_scopes("tasks"))
+@mcp.tool()
 def manage_task(action: str, task_name: str, script_path: str = "", trigger_time: str = "08:00") -> str:
     """
     Manage Windows Task Scheduler tasks.
