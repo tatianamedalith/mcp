@@ -1,6 +1,7 @@
 from fastmcp import FastMCP
 
 from app.config import Config
+from app.downloads import build_download_url
 from app.tools.email import send_email as _send_email
 from app.tools.report.word_tool import create_report as _create_report
 from app.tools.presentation.slides_tool import create_presentation as _create_presentation
@@ -14,21 +15,42 @@ def send_email(
     to: list[str],
     subject: str,
     body: str,
+    sender_name: str,
+    sender_role: str,
+    sender_company: str,
     cc: list[str] | None = None,
     bcc: list[str] | None = None,
     attachments: list[str] | None = None,
 ) -> str:
     """
-    Send an email.
-    - to: recipient email addresses
-    - subject: email subject
-    - body: plain text body (wrapped in HTML template with signature)
-    - cc: CC recipients (optional)
-    - bcc: BCC recipients (optional)
-    - attachments: absolute file paths to attach (optional)
-    Returns a confirmation with message_id.
+    Send an email on behalf of the current user.
+
+    The signature fields (sender_name, sender_role, sender_company) are REQUIRED
+    and must describe the actual person sending the email — never the recipient
+    and never a hardcoded default. If the caller does not know them, ask the
+    user before calling this tool.
+
+    Args:
+        to: recipient email addresses.
+        subject: email subject.
+        body: plain text body (wrapped in HTML template with signature).
+        sender_name: REQUIRED. Full name of the sender (the user, not the recipient).
+        sender_role: REQUIRED. Job title of the sender.
+        sender_company: REQUIRED. Company name of the sender.
+        cc: CC recipients (optional).
+        bcc: BCC recipients (optional).
+        attachments: absolute file paths to attach (optional).
+
+    Returns:
+        Confirmation with message_id.
     """
-    return _send_email(to, subject, body, cc=cc, bcc=bcc, attachments=attachments)
+    return _send_email(
+        to, subject, body,
+        sender_name=sender_name,
+        sender_role=sender_role,
+        sender_company=sender_company,
+        cc=cc, bcc=bcc, attachments=attachments,
+    )
 
 
 @mcp.tool()
@@ -52,13 +74,20 @@ def create_report(
                      Defaults to Config.REPORTS_DIR.
     
     Returns:
-        Absolute path of the created .docx file.
+        A signed, time-limited download URL for the generated .docx.
+        The file is also persisted on the server filesystem for auditing.
     """
-    return _create_report(
+    path = _create_report(
         title, content, filename,
         sections=sections,
         output_path=output_path or str(Config.REPORTS_DIR),
     )
+    url = build_download_url(path)
+    return (
+        f"Documento generado: {filename}.docx\n"
+        f"Enlace de descarga (responde al usuario con esta URL tal cual, sin reformatear): {url}"
+    )
+
 
 
 @mcp.tool()
@@ -82,10 +111,19 @@ def create_presentation(title: str, slides: str, filename: str, output_path: str
                      Defaults to Config.PRESENTATIONS_DIR.
     
     Returns:
-        Absolute path of the created .pptx file.
+        A signed, time-limited download URL for the generated .pptx.
+        The file is also persisted on the server filesystem for auditing.
     """
-    
-    return _create_presentation(title, slides, filename, output_path=output_path or str(Config.PRESENTATIONS_DIR))
+    path = _create_presentation(
+        title, slides, filename,
+        output_path=output_path or str(Config.PRESENTATIONS_DIR),
+    )
+    url = build_download_url(path)
+    return (
+        f"Presentación generada: {filename}.pptx\n"
+        f"Enlace de descarga (responde al usuario con esta URL tal cual, sin reformatear): {url}"
+    )
+
 
 @mcp.tool()
 def manage_task(action: str, task_name: str, script_path: str = "", trigger_time: str = "08:00") -> str:
