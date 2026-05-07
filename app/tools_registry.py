@@ -58,8 +58,7 @@ def create_report(
     title: str,
     content: str,
     filename: str,
-    sections: str | None = None,
-    output_path: str | None = None,
+    sections: str | None = None
 ) -> str:
     """
     Create a Word document (.docx) with optional sections.
@@ -80,7 +79,7 @@ def create_report(
     path = _create_report(
         title, content, filename,
         sections=sections,
-        output_path=output_path or str(Config.REPORTS_DIR),
+        output_path= str(Config.REPORTS_DIR),
     )
     url = build_download_url(path)
     return (
@@ -91,7 +90,7 @@ def create_report(
 
 
 @mcp.tool()
-def create_presentation(title: str, slides: str, filename: str, output_path: str | None = None) -> str:
+def create_presentation(title: str, slides: str, filename: str) -> str:
     """
     Create a PowerPoint presentation (.pptx) from a template.
     
@@ -116,7 +115,7 @@ def create_presentation(title: str, slides: str, filename: str, output_path: str
     """
     path = _create_presentation(
         title, slides, filename,
-        output_path=output_path or str(Config.PRESENTATIONS_DIR),
+        output_path=str(Config.PRESENTATIONS_DIR),
     )
     url = build_download_url(path)
     return (
